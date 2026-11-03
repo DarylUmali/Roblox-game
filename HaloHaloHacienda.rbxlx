@@ -1,0 +1,175 @@
+<roblox version="4">
+  <Meta name="ExplicitAutoJoints" dt="string">true</Meta>
+  <Meta name="FFlagConvertImageLabelsToImageButtons" dt="string">true</Meta>
+  <Item class="Workspace" referent="RBXWorkspace">
+    <Properties>
+      <string name="Name">Workspace</string>
+      <bool name="StreamingEnabled">false</bool>
+      <bool name="AllowThirdPartySales">false</bool>
+      <Ref name="CurrentCamera">RBXCamera</Ref>
+    </Properties>
+    <Item class="Camera" referent="RBXCamera">
+      <Properties>
+        <string name="Name">Camera</string>
+        <CFrame name="CFrame">0,18,28,1,0,0,0,0.9396926,0.3420201,0,-0.3420201,0.9396926</CFrame>
+        <float name="FieldOfView">70</float>
+      </Properties>
+    </Item>
+  </Item>
+  <Item class="ReplicatedStorage" referent="RBXReplicatedStorage">
+    <Properties><string name="Name">ReplicatedStorage</string></Properties>
+    <Item class="RemoteEvent" referent="RBXGameEvent">
+      <Properties><string name="Name">GameEvent</string></Properties>
+    </Item>
+  </Item>
+  <Item class="ServerScriptService" referent="RBXServerScriptService">
+    <Properties><string name="Name">ServerScriptService</string></Properties>
+    <Item class="Script" referent="RBXMainScript">
+      <Properties>
+        <string name="Name">HaciendaServer</string>
+        <bool name="Enabled">true</bool>
+        <ProtectedString name="Source"><![CDATA[
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Lighting = game:GetService("Lighting")
+local event = ReplicatedStorage:WaitForChild("GameEvent")
+
+local old = workspace:FindFirstChild("Hacienda")
+if old then old:Destroy() end
+local map = Instance.new("Folder")
+map.Name = "Hacienda"
+map.Parent = workspace
+
+local COLORS = {grass=Color3.fromRGB(105,170,102), soil=Color3.fromRGB(112,72,42), wood=Color3.fromRGB(124,78,43), roof=Color3.fromRGB(211,128,73), cream=Color3.fromRGB(255,235,184), water=Color3.fromRGB(73,177,190), pink=Color3.fromRGB(241,147,170), purple=Color3.fromRGB(154,108,193), yellow=Color3.fromRGB(248,205,77)}
+local function part(name, size, pos, color, parent, material)
+	local p = Instance.new("Part")
+	p.Name=name; p.Size=size; p.Position=pos; p.Anchored=true; p.Color=color; p.Material=material or Enum.Material.SmoothPlastic; p.Parent=parent or map
+	return p
+end
+local function label(parent, text, color)
+	local gui=Instance.new("BillboardGui"); gui.Size=UDim2.fromOffset(180,42); gui.StudsOffset=Vector3.new(0,4,0); gui.AlwaysOnTop=true; gui.Parent=parent
+	local t=Instance.new("TextLabel"); t.Size=UDim2.fromScale(1,1); t.BackgroundTransparency=1; t.Text=text; t.TextColor3=color or Color3.new(1,1,1); t.TextStrokeTransparency=.35; t.Font=Enum.Font.GothamBold; t.TextScaled=true; t.Parent=gui
+end
+local function prompt(parent, action, object)
+	local q=Instance.new("ProximityPrompt"); q.ActionText=action; q.ObjectText=object; q.HoldDuration=.35; q.MaxActivationDistance=10; q.RequiresLineOfSight=false; q.Parent=parent; return q
+end
+
+Lighting.ClockTime=17.2; Lighting.Brightness=2.2; Lighting.Ambient=Color3.fromRGB(120,105,110); Lighting.OutdoorAmbient=Color3.fromRGB(140,145,130)
+part("Ground",Vector3.new(170,1,130),Vector3.new(0,-1,0),COLORS.grass,map,Enum.Material.Grass)
+part("Plaza",Vector3.new(44,.35,30),Vector3.new(0,.1,0),Color3.fromRGB(202,157,102),map,Enum.Material.Cobblestone)
+part("RoadNorth",Vector3.new(170,.2,9),Vector3.new(0,.2,-39),Color3.fromRGB(183,139,92),map,Enum.Material.Ground)
+part("RoadSouth",Vector3.new(170,.2,9),Vector3.new(0,.2,39),Color3.fromRGB(183,139,92),map,Enum.Material.Ground)
+part("River",Vector3.new(10,.2,130),Vector3.new(71,.25,0),COLORS.water,map,Enum.Material.Glass)
+for _, x in ipairs({-76,-62,62,76}) do
+	part("TreeTrunk",Vector3.new(2,10,2),Vector3.new(x,5,-53),COLORS.wood,map,Enum.Material.Wood)
+	local crown=part("MangoTree",Vector3.new(10,8,10),Vector3.new(x,11,-53),COLORS.grass,map,Enum.Material.Grass); crown.Shape=Enum.PartType.Ball
+end
+
+local house=part("AncestralHome",Vector3.new(22,9,15),Vector3.new(0,4,23),COLORS.wood,map,Enum.Material.Wood); label(house,"HALO-HALO HACIENDA",COLORS.cream)
+part("HomeRoof",Vector3.new(25,1.3,18),Vector3.new(0,9,23),COLORS.roof,map,Enum.Material.WoodPlanks)
+local cook=part("Kusina",Vector3.new(10,5,7),Vector3.new(0,2.7,10),COLORS.cream,map,Enum.Material.Wood); label(cook,"KUSINA",COLORS.purple)
+local cookPrompt=prompt(cook,"Cook a Dish","Halo-Halo Station")
+
+local marker=part("BayanihanMarker",Vector3.new(10,.5,10),Vector3.new(0,.5,0),COLORS.yellow,map,Enum.Material.Neon); marker.Shape=Enum.PartType.Cylinder; label(marker,"BAYANIHAN",COLORS.cream)
+local markerPrompt=prompt(marker,"Join Task","Community Marker")
+local shrine=part("SpiritShrine",Vector3.new(9,4,5),Vector3.new(26,2,7),COLORS.pink,map,Enum.Material.Wood); label(shrine,"SPIRIT SHRINE",COLORS.cream)
+local shrinePrompt=prompt(shrine,"Serve Spirits","Order Board")
+
+local plots={}
+local function makePlot(index, x, z)
+	local folder=Instance.new("Folder"); folder.Name="Plot"..index; folder.Parent=map
+	part("PlotBorder",Vector3.new(25,.25,18),Vector3.new(x,.3,z),COLORS.wood,folder,Enum.Material.Wood)
+	local soil=part("Soil",Vector3.new(22,.3,15),Vector3.new(x,.5,z),COLORS.soil,folder,Enum.Material.Ground)
+	local sign=part("PlotSign",Vector3.new(4,3,.4),Vector3.new(x-10,2,z-9),COLORS.wood,folder,Enum.Material.Wood); label(sign,"PLOT "..index,COLORS.cream)
+	local crops={}
+	for row=-1,1 do for col=-1,1 do
+		local spot=part("CropSpot",Vector3.new(5,.25,3.8),Vector3.new(x+col*6,.7,z+row*5),Color3.fromRGB(83,51,31),folder,Enum.Material.Ground)
+		local pr=prompt(spot,"Plant / Harvest","Crop Bed")
+		pr.Triggered:Connect(function(player)
+			if player:GetAttribute("Plot")~=index then event:FireClient(player,"Toast","This is Plot "..index..". Your plot is Plot "..(player:GetAttribute("Plot") or "?").."."); return end
+			local crop=spot:FindFirstChild("Crop")
+			if crop then crop:Destroy(); player.leaderstats.Ngiti.Value+=2; event:FireClient(player,"Toast","Harvested a fresh crop! +2 Ngiti"); return end
+			local sprout=part("Crop",Vector3.new(1,1.5,1),spot.Position+Vector3.new(0,1,0),COLORS.yellow,folder,Enum.Material.Grass); sprout.Shape=Enum.PartType.Ball; sprout:SetAttribute("Owner",player.UserId); event:FireClient(player,"Toast","A seed is growing! Come back to harvest.")
+		end)
+		table.insert(crops,spot)
+	end end
+	local pet=part("Karabao",Vector3.new(3,2,4),Vector3.new(x+8,1.4,z+7),Color3.fromRGB(75,53,43),folder,Enum.Material.SmoothPlastic); pet.Shape=Enum.PartType.Ball; label(pet,"KARABAO",COLORS.cream)
+	local petPrompt=prompt(pet,"Pet Karabao","Friendly Karabao")
+	petPrompt.Triggered:Connect(function(player) if player:GetAttribute("Plot")==index then player.leaderstats.Ngiti.Value+=1; event:FireClient(player,"Toast","Your karabao is happy! +1 Ngiti") end end)
+	plots[index]={x=x,z=z}
+end
+makePlot(1,-48,-20); makePlot(2,-16,-20); makePlot(3,48,-20); makePlot(4,-48,20); makePlot(5,16,20); makePlot(6,48,20)
+
+local orders={"Ube Halaya","Sinigang","Adobo","Leche Flan"}; local order=orders[math.random(#orders)]; local taskOpen=false; local taskEnds=0; local contributors={}
+local function announce(message) event:FireAllClients("Toast",message) end
+local function startTask()
+	if taskOpen then return end
+	taskOpen=true; taskEnds=os.clock()+35; contributors={}; announce("BAYANIHAN! Everyone to the glowing marker!"); event:FireAllClients("Task",true,35)
+	task.spawn(function()
+		while taskOpen and os.clock()<taskEnds do task.wait(1); event:FireAllClients("Task",true,math.max(0,math.ceil(taskEnds-os.clock())),#contributors) end
+		if taskOpen then taskOpen=false; event:FireAllClients("Task",false,0,#contributors); if #contributors>=3 then announce("Bayanihan complete! Everyone gets 2x Ngiti for 60 seconds!"); for _,p in ipairs(Players:GetPlayers()) do p:SetAttribute("BlessedUntil",os.clock()+60) end else announce("The task is over. The village will try again soon!") end end
+	end)
+end
+markerPrompt.Triggered:Connect(function(player) if taskOpen and not table.find(contributors,player.UserId) then table.insert(contributors,player.UserId); event:FireClient(player,"Toast","You joined Bayanihan! Every helping hand counts.") elseif not taskOpen then event:FireClient(player,"Toast","The next Bayanihan task is coming soon.") end end)
+cookPrompt.Triggered:Connect(function(player) player.leaderstats.Ngiti.Value+=5; event:FireClient(player,"Toast","Lutong Bahay! You cooked "..order..". +5 Ngiti"); order=orders[math.random(#orders)] end)
+shrinePrompt.Triggered:Connect(function(player) player.leaderstats.Ngiti.Value+=3; event:FireClient(player,"Toast","The spirits loved your offering! +3 Ngiti"); event:FireClient(player,"Order",order) end)
+task.spawn(function() while true do task.wait(15); startTask() end end)
+
+local function assign(player)
+	local used={}; for _,p in ipairs(Players:GetPlayers()) do if p~=player and p:GetAttribute("Plot") then used[p:GetAttribute("Plot")]=true end end
+	for i=1,6 do if not used[i] then player:SetAttribute("Plot",i); break end end
+	local stats=Instance.new("Folder"); stats.Name="leaderstats"; stats.Parent=player; local ngiti=Instance.new("IntValue"); ngiti.Name="Ngiti"; ngiti.Value=0; ngiti.Parent=stats
+	player:SetAttribute("BlessedUntil",0); event:FireClient(player,"Welcome",player:GetAttribute("Plot"),order)
+end
+Players.PlayerAdded:Connect(assign)
+Players.PlayerRemoving:Connect(function(player) end)
+for _,player in ipairs(Players:GetPlayers()) do assign(player) end
+]]></ProtectedString>
+      </Properties>
+    </Item>
+  </Item>
+  <Item class="StarterPlayer" referent="RBXStarterPlayer">
+    <Properties><string name="Name">StarterPlayer</string></Properties>
+    <Item class="StarterPlayerScripts" referent="RBXStarterPlayerScripts">
+      <Properties><string name="Name">StarterPlayerScripts</string></Properties>
+      <Item class="LocalScript" referent="RBXClientScript">
+        <Properties>
+          <string name="Name">HaciendaClient</string>
+          <bool name="Enabled">true</bool>
+          <ProtectedString name="Source"><![CDATA[
+local Players=game:GetService("Players"); local ReplicatedStorage=game:GetService("ReplicatedStorage"); local TweenService=game:GetService("TweenService")
+local player=Players.LocalPlayer; local event=ReplicatedStorage:WaitForChild("GameEvent")
+local gui=Instance.new("ScreenGui"); gui.Name="HaciendaHUD"; gui.ResetOnSpawn=false; gui.Parent=player:WaitForChild("PlayerGui")
+local top=Instance.new("Frame"); top.Size=UDim2.fromOffset(390,92); top.Position=UDim2.fromOffset(18,18); top.BackgroundColor3=Color3.fromRGB(57,42,49); top.BackgroundTransparency=.08; top.Parent=gui
+local corner=Instance.new("UICorner"); corner.CornerRadius=UDim.new(0,12); corner.Parent=top
+local title=Instance.new("TextLabel"); title.Size=UDim2.fromScale(1,.38); title.BackgroundTransparency=1; title.Text="HALO-HALO HACIENDA"; title.TextColor3=Color3.fromRGB(255,224,132); title.Font=Enum.Font.GothamBold; title.TextScaled=true; title.Parent=top
+local info=Instance.new("TextLabel"); info.Position=UDim2.fromScale(0,.38); info.Size=UDim2.fromScale(1,.25); info.BackgroundTransparency=1; info.TextColor3=Color3.fromRGB(255,246,220); info.Font=Enum.Font.Gotham; info.TextScaled=true; info.Parent=top
+local tip=Instance.new("TextLabel"); tip.Position=UDim2.fromScale(0,.63); tip.Size=UDim2.fromScale(1,.32); tip.BackgroundTransparency=1; tip.TextColor3=Color3.fromRGB(180,235,174); tip.Font=Enum.Font.Gotham; tip.TextScaled=true; tip.Text="Plant, pet, cook, and help your neighbors!"; tip.Parent=top
+local toast=Instance.new("TextLabel"); toast.Size=UDim2.fromOffset(520,58); toast.Position=UDim2.new(.5,-260,0,125); toast.BackgroundColor3=Color3.fromRGB(63,47,63); toast.TextColor3=Color3.fromRGB(255,247,218); toast.Font=Enum.Font.GothamBold; toast.TextScaled=true; toast.Visible=false; toast.Parent=gui; local tc=Instance.new("UICorner"); tc.CornerRadius=UDim.new(0,10); tc.Parent=toast
+local taskFrame=Instance.new("Frame"); taskFrame.Size=UDim2.fromOffset(500,76); taskFrame.Position=UDim2.new(.5,-250,1,-105); taskFrame.BackgroundColor3=Color3.fromRGB(47,91,76); taskFrame.Visible=false; taskFrame.Parent=gui; local bar=Instance.new("Frame"); bar.Position=UDim2.fromOffset(12,40); bar.Size=UDim2.fromOffset(476,20); bar.BackgroundColor3=Color3.fromRGB(29,53,46); bar.Parent=taskFrame; local fill=Instance.new("Frame"); fill.Size=UDim2.fromScale(0,1); fill.BackgroundColor3=Color3.fromRGB(249,202,73); fill.Parent=bar; local taskText=Instance.new("TextLabel"); taskText.Size=UDim2.fromScale(1,.5); taskText.BackgroundTransparency=1; taskText.TextColor3=Color3.new(1,1,1); taskText.Font=Enum.Font.GothamBold; taskText.TextScaled=true; taskText.Parent=taskFrame
+local toastId=0
+local function show(message) toastId+=1; local id=toastId; toast.Text=message; toast.Visible=true; toast.TextTransparency=0; task.wait(3); if id==toastId then TweenService:Create(toast,TweenInfo.new(.4),{TextTransparency=1}):Play(); task.wait(.4); toast.Visible=false end end
+event.OnClientEvent:Connect(function(kind,a,b,c)
+	if kind=="Welcome" then info.Text="Your home: Plot "..a.."  |  Ngiti: 0"; show("Mabuhay! Your plot is ready. Order: "..b)
+	elseif kind=="Toast" then show(a)
+	elseif kind=="Order" then show("Spirit order: "..a.." | Cook at the Kusina")
+	elseif kind=="Task" then taskFrame.Visible=a; if a then local needed=3; local count=c or 0; fill.Size=UDim2.fromScale(math.clamp(count/needed,0,1),1); taskText.Text="BAYANIHAN  •  "..b.."s left  •  "..count.." helpers" end end
+end)
+task.spawn(function() while true do task.wait(1); local stats=player:FindFirstChild("leaderstats"); if stats and stats:FindFirstChild("Ngiti") then info.Text="Your home: Plot "..(player:GetAttribute("Plot") or "-").."  |  Ngiti: "..stats.Ngiti.Value end end end)
+]]></ProtectedString>
+        </Properties>
+      </Item>
+    </Item>
+  </Item>
+  <Item class="SpawnLocation" referent="RBXSpawn">
+    <Properties>
+      <string name="Name">HaciendaSpawn</string>
+      <CFrame name="CFrame">0,1,34,1,0,0,0,1,0,0,0,1</CFrame>
+      <Vector3 name="Size">8,1,8</Vector3>
+      <bool name="Anchored">true</bool>
+      <bool name="Neutral">true</bool>
+      <bool name="AllowTeamChangeOnTouch">false</bool>
+      <BrickColor name="BrickColor">Bright green</BrickColor>
+    </Properties>
+  </Item>
+</roblox>
