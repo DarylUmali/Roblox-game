@@ -16,8 +16,9 @@
 ## Open and publish
 
 1. Open `HaloHaloHacienda.rbxlx` in Roblox Studio.
-2. Press **Play** to test the farm loop. Use **Start** with multiple players to test Bayanihan.
-3. Set the experience name, thumbnail, and permissions in **Game Settings**.
-4. Use **File > Publish to Roblox** to create or update the live experience.
+2. In **Build** mode, the serialized Hacienda folder under Workspace contains the editable preview map. Select parts or models and use the Move, Scale, and Rotate tools to customize it manually.
+3. Press **Play** to test the farm loop. Use **Start** with multiple players to test Bayanihan.
+4. Set the experience name, thumbnail, and permissions in **Game Settings**.
+5. Use **File > Publish to Roblox** to create or update the live experience.
 
-The place is intentionally script-generated so the `.rbxlx` stays small and the map is easy to rebalance in one server script. Roblox Studio is still required for the final account-specific publish step.
+The place keeps an editor-visible serialized map for manual building. The server script rebuilds its gameplay version when Play starts so prompts, crops, animals, and player state are initialized consistently. Roblox Studio is still required for the final account-specific publish step.
