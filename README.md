@@ -4,7 +4,8 @@
 
 ## Included
 
-- Normal-sized barangay map with a plaza, river, ancestral home, kusina, shrine, and six player plots.
+- Normal-sized barangay map with a central plaza, river, walkable ancestral home, kusina, shrine, and six evenly spaced player plots.
+- Script-built models for buildings, mango trees, crop plants, and karabao replace the former placeholder blocks.
 - Farming interaction: plant and harvest nine crop beds per plot.
 - Karabao pet interaction for bonus Ngiti.
 - Kusina cooking and spirit order interactions.

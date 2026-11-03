@@ -41,7 +41,7 @@ local map = Instance.new("Folder")
 map.Name = "Hacienda"
 map.Parent = workspace
 
-local COLORS = {grass=Color3.fromRGB(105,170,102), soil=Color3.fromRGB(112,72,42), wood=Color3.fromRGB(124,78,43), roof=Color3.fromRGB(211,128,73), cream=Color3.fromRGB(255,235,184), water=Color3.fromRGB(73,177,190), pink=Color3.fromRGB(241,147,170), purple=Color3.fromRGB(154,108,193), yellow=Color3.fromRGB(248,205,77)}
+local COLORS = {grass=Color3.fromRGB(105,170,102), soil=Color3.fromRGB(112,72,42), wood=Color3.fromRGB(124,78,43), roof=Color3.fromRGB(211,128,73), cream=Color3.fromRGB(255,235,184), water=Color3.fromRGB(73,177,190), pink=Color3.fromRGB(241,147,170), purple=Color3.fromRGB(154,108,193), yellow=Color3.fromRGB(248,205,77), dark=Color3.fromRGB(54,39,34), leaf=Color3.fromRGB(55,134,70), red=Color3.fromRGB(198,72,57)}
 local function part(name, size, pos, color, parent, material)
 	local p = Instance.new("Part")
 	p.Name=name; p.Size=size; p.Position=pos; p.Anchored=true; p.Color=color; p.Material=material or Enum.Material.SmoothPlastic; p.Parent=parent or map
@@ -54,35 +54,78 @@ end
 local function prompt(parent, action, object)
 	local q=Instance.new("ProximityPrompt"); q.ActionText=action; q.ObjectText=object; q.HoldDuration=.35; q.MaxActivationDistance=10; q.RequiresLineOfSight=false; q.Parent=parent; return q
 end
+local function model(name, parent)
+	local m=Instance.new("Model"); m.Name=name; m.Parent=parent or map; return m
+end
+local function roof(name, size, pos, color, parent)
+	local r=part(name,size,pos,color,parent,Enum.Material.WoodPlanks); r.CFrame=CFrame.new(pos)*CFrame.Angles(0,0,math.rad(7)); return r
+end
+local function tree(pos, parent)
+	local m=model("MangoTree",parent)
+	part("Trunk",Vector3.new(2.2,9,2.2),pos+Vector3.new(0,4.5,0),COLORS.wood,m,Enum.Material.Wood)
+	local crown=part("LeafCanopy",Vector3.new(9,7,9),pos+Vector3.new(0,10,0),COLORS.leaf,m,Enum.Material.Grass); crown.Shape=Enum.PartType.Ball
+	for _,offset in ipairs({Vector3.new(3,10,0),Vector3.new(-3,10,0),Vector3.new(0,12,2)}) do
+		local leaf=part("LeafCluster",Vector3.new(5,4,5),pos+offset,COLORS.grass,m,Enum.Material.Grass); leaf.Shape=Enum.PartType.Ball
+	end
+end
+local function building(name, center, size, wallColor, roofColor, caption, parent)
+	local m=model(name,parent)
+	local x,y,z=center.X,center.Y,center.Z; local sx,sy,sz=size.X,size.Y,size.Z
+	part("BackWall",Vector3.new(sx,sy,.5),Vector3.new(x,y+sy/2,z+sz/2),wallColor,m,Enum.Material.Wood)
+	part("LeftWall",Vector3.new(.5,sy,sz),Vector3.new(x-sx/2,y,z),wallColor,m,Enum.Material.Wood)
+	part("RightWall",Vector3.new(.5,sy,sz),Vector3.new(x+sx/2,y,z),wallColor,m,Enum.Material.Wood)
+	part("FrontLeft",Vector3.new((sx-4)/2,sy,.5),Vector3.new(x-(sx+4)/4,y,z-sz/2),wallColor,m,Enum.Material.Wood)
+	part("FrontRight",Vector3.new((sx-4)/2,sy,.5),Vector3.new(x+(sx+4)/4,y,z-sz/2),wallColor,m,Enum.Material.Wood)
+	part("Door",Vector3.new(3.2,5,.25),Vector3.new(x,y-1.5,z-sz/2-.15),COLORS.dark,m,Enum.Material.Wood)
+	roof("Roof",Vector3.new(sx+3,1.2,sz+3),Vector3.new(x,y+sy/2+.7,z),roofColor,m)
+	local sign=part("Sign",Vector3.new(7,1.5,.3),Vector3.new(x,y+sy/2+2,z-sz/2-1),roofColor,m,Enum.Material.Wood)
+	label(sign,caption,COLORS.cream)
+	return m
+end
+local function cropModel(pos, parent)
+	local m=model("Crop",parent)
+	part("Stem",Vector3.new(.35,2,.35),pos+Vector3.new(0,1,0),COLORS.leaf,m,Enum.Material.Grass)
+	for _,offset in ipairs({Vector3.new(.45,1.2,0),Vector3.new(-.45,1.35,0),Vector3.new(0,1.7,.35)}) do
+		local leaf=part("Leaf",Vector3.new(1.1,.22,.55),pos+offset,COLORS.leaf,m,Enum.Material.Grass); leaf.CFrame=CFrame.new(pos+offset)*CFrame.Angles(0,offset.Z,math.rad(offset.X*30))
+	end
+	local fruit=part("Fruit",Vector3.new(.7,.7,.7),pos+Vector3.new(0,2.1,0),COLORS.yellow,m,Enum.Material.SmoothPlastic); fruit.Shape=Enum.PartType.Ball
+	return m
+end
+local function karabao(pos,parent)
+	local m=model("Karabao",parent)
+	local body=part("Body",Vector3.new(4,2.2,2.4),pos,COLORS.dark,m,Enum.Material.SmoothPlastic); body.Shape=Enum.PartType.Ball
+	part("Head",Vector3.new(1.7,1.8,1.8),pos+Vector3.new(0,0,-1.7),COLORS.dark,m,Enum.Material.SmoothPlastic)
+	for _,x in ipairs({-1.2,1.2}) do part("Leg",Vector3.new(.45,1.5,.45),pos+Vector3.new(x,-1,0),COLORS.dark,m,Enum.Material.SmoothPlastic) end
+	for _,x in ipairs({-1.1,1.1}) do local horn=part("Horn",Vector3.new(.25,1.1,.25),pos+Vector3.new(x*.65,.9,-1.8),COLORS.cream,m,Enum.Material.SmoothPlastic); horn.CFrame=CFrame.new(horn.Position)*CFrame.Angles(0,0,math.rad(x*35)) end
+	label(body,"KARABAO",COLORS.cream)
+	return m
+end
 
 Lighting.ClockTime=17.2; Lighting.Brightness=2.2; Lighting.Ambient=Color3.fromRGB(120,105,110); Lighting.OutdoorAmbient=Color3.fromRGB(140,145,130)
 part("Ground",Vector3.new(170,1,130),Vector3.new(0,-1,0),COLORS.grass,map,Enum.Material.Grass)
-part("Plaza",Vector3.new(44,.35,30),Vector3.new(0,.1,0),Color3.fromRGB(202,157,102),map,Enum.Material.Cobblestone)
-part("RoadNorth",Vector3.new(170,.2,9),Vector3.new(0,.2,-39),Color3.fromRGB(183,139,92),map,Enum.Material.Ground)
-part("RoadSouth",Vector3.new(170,.2,9),Vector3.new(0,.2,39),Color3.fromRGB(183,139,92),map,Enum.Material.Ground)
-part("River",Vector3.new(10,.2,130),Vector3.new(71,.25,0),COLORS.water,map,Enum.Material.Glass)
-for _, x in ipairs({-76,-62,62,76}) do
-	part("TreeTrunk",Vector3.new(2,10,2),Vector3.new(x,5,-53),COLORS.wood,map,Enum.Material.Wood)
-	local crown=part("MangoTree",Vector3.new(10,8,10),Vector3.new(x,11,-53),COLORS.grass,map,Enum.Material.Grass); crown.Shape=Enum.PartType.Ball
-end
+part("Plaza",Vector3.new(42,.35,42),Vector3.new(0,.1,0),Color3.fromRGB(202,157,102),map,Enum.Material.Cobblestone)
+part("RoadWest",Vector3.new(12,.2,112),Vector3.new(-18,.2,0),Color3.fromRGB(183,139,92),map,Enum.Material.Ground)
+part("RoadEast",Vector3.new(12,.2,112),Vector3.new(18,.2,0),Color3.fromRGB(183,139,92),map,Enum.Material.Ground)
+part("River",Vector3.new(8,.2,130),Vector3.new(82,.25,0),COLORS.water,map,Enum.Material.Glass)
+for _,pos in ipairs({Vector3.new(-78,0,-53),Vector3.new(-28,0,-53),Vector3.new(28,0,-53),Vector3.new(78,0,-53),Vector3.new(-78,0,53),Vector3.new(78,0,53)}) do tree(pos,map) end
 
-local house=part("AncestralHome",Vector3.new(22,9,15),Vector3.new(0,4,23),COLORS.wood,map,Enum.Material.Wood); label(house,"HALO-HALO HACIENDA",COLORS.cream)
-part("HomeRoof",Vector3.new(25,1.3,18),Vector3.new(0,9,23),COLORS.roof,map,Enum.Material.WoodPlanks)
-local cook=part("Kusina",Vector3.new(10,5,7),Vector3.new(0,2.7,10),COLORS.cream,map,Enum.Material.Wood); label(cook,"KUSINA",COLORS.purple)
+building("AncestralHome",Vector3.new(0,4,39),Vector3.new(24,9,15),COLORS.wood,COLORS.roof,"HALO-HALO HACIENDA",map)
+local cookModel=building("Kusina",Vector3.new(0,3,-39),Vector3.new(16,6,11),COLORS.cream,COLORS.purple,"KUSINA",map)
+local cook=cookModel:FindFirstChild("Door")
 local cookPrompt=prompt(cook,"Cook a Dish","Halo-Halo Station")
 
 local marker=part("BayanihanMarker",Vector3.new(10,.5,10),Vector3.new(0,.5,0),COLORS.yellow,map,Enum.Material.Neon); marker.Shape=Enum.PartType.Cylinder; label(marker,"BAYANIHAN",COLORS.cream)
 local markerPrompt=prompt(marker,"Join Task","Community Marker")
-local shrine=part("SpiritShrine",Vector3.new(9,4,5),Vector3.new(26,2,7),COLORS.pink,map,Enum.Material.Wood); label(shrine,"SPIRIT SHRINE",COLORS.cream)
+local shrineModel=building("SpiritShrine",Vector3.new(0,2,17),Vector3.new(12,4,8),COLORS.pink,COLORS.red,"SPIRIT SHRINE",map)
+local shrine=shrineModel:FindFirstChild("Door")
 local shrinePrompt=prompt(shrine,"Serve Spirits","Order Board")
 
 local plots={}
 local function makePlot(index, x, z)
-	local folder=Instance.new("Folder"); folder.Name="Plot"..index; folder.Parent=map
-	part("PlotBorder",Vector3.new(25,.25,18),Vector3.new(x,.3,z),COLORS.wood,folder,Enum.Material.Wood)
-	local soil=part("Soil",Vector3.new(22,.3,15),Vector3.new(x,.5,z),COLORS.soil,folder,Enum.Material.Ground)
-	local sign=part("PlotSign",Vector3.new(4,3,.4),Vector3.new(x-10,2,z-9),COLORS.wood,folder,Enum.Material.Wood); label(sign,"PLOT "..index,COLORS.cream)
-	local crops={}
+	local folder=model("Plot"..index,map)
+	part("PlotBorder",Vector3.new(27,.35,21),Vector3.new(x,.3,z),COLORS.wood,folder,Enum.Material.Wood)
+	part("Soil",Vector3.new(24,.3,18),Vector3.new(x,.5,z),COLORS.soil,folder,Enum.Material.Ground)
+	local sign=part("PlotSign",Vector3.new(5,3,.4),Vector3.new(x-10,2,z-10),COLORS.wood,folder,Enum.Material.Wood); label(sign,"PLOT "..index,COLORS.cream)
 	for row=-1,1 do for col=-1,1 do
 		local spot=part("CropSpot",Vector3.new(5,.25,3.8),Vector3.new(x+col*6,.7,z+row*5),Color3.fromRGB(83,51,31),folder,Enum.Material.Ground)
 		local pr=prompt(spot,"Plant / Harvest","Crop Bed")
@@ -90,16 +133,16 @@ local function makePlot(index, x, z)
 			if player:GetAttribute("Plot")~=index then event:FireClient(player,"Toast","This is Plot "..index..". Your plot is Plot "..(player:GetAttribute("Plot") or "?").."."); return end
 			local crop=spot:FindFirstChild("Crop")
 			if crop then crop:Destroy(); player.leaderstats.Ngiti.Value+=2; event:FireClient(player,"Toast","Harvested a fresh crop! +2 Ngiti"); return end
-			local sprout=part("Crop",Vector3.new(1,1.5,1),spot.Position+Vector3.new(0,1,0),COLORS.yellow,folder,Enum.Material.Grass); sprout.Shape=Enum.PartType.Ball; sprout:SetAttribute("Owner",player.UserId); event:FireClient(player,"Toast","A seed is growing! Come back to harvest.")
+			local sprout=cropModel(spot.Position,folder); sprout:SetAttribute("Owner",player.UserId); event:FireClient(player,"Toast","A seed is growing! Come back to harvest.")
 		end)
-		table.insert(crops,spot)
 	end end
-	local pet=part("Karabao",Vector3.new(3,2,4),Vector3.new(x+8,1.4,z+7),Color3.fromRGB(75,53,43),folder,Enum.Material.SmoothPlastic); pet.Shape=Enum.PartType.Ball; label(pet,"KARABAO",COLORS.cream)
-	local petPrompt=prompt(pet,"Pet Karabao","Friendly Karabao")
+	local pet=karabao(Vector3.new(x+8,2,z+7),folder)
+	local petBody=pet:FindFirstChild("Body")
+	local petPrompt=prompt(petBody,"Pet Karabao","Friendly Karabao")
 	petPrompt.Triggered:Connect(function(player) if player:GetAttribute("Plot")==index then player.leaderstats.Ngiti.Value+=1; event:FireClient(player,"Toast","Your karabao is happy! +1 Ngiti") end end)
 	plots[index]={x=x,z=z}
 end
-makePlot(1,-48,-20); makePlot(2,-16,-20); makePlot(3,48,-20); makePlot(4,-48,20); makePlot(5,16,20); makePlot(6,48,20)
+makePlot(1,-55,-30); makePlot(2,-55,0); makePlot(3,-55,30); makePlot(4,55,-30); makePlot(5,55,0); makePlot(6,55,30)
 
 local orders={"Ube Halaya","Sinigang","Adobo","Leche Flan"}; local order=orders[math.random(#orders)]; local taskOpen=false; local taskEnds=0; local contributors={}
 local function announce(message) event:FireAllClients("Toast",message) end
