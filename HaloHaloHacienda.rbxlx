@@ -12,12 +12,12 @@
     <Item class="Camera" referent="RBXCamera">
       <Properties>
         <string name="Name">Camera</string>
-        <CFrame name="CFrame">0,80,130,1,0,0,0,0.852,0.524,0,-0.524,0.852</CFrame>
+        <CFrame name="CFrame">0,100,150,1,0,0,0,0.832,-0.555,0,0.555,0.832</CFrame>
         <float name="FieldOfView">70</float>
       </Properties>
     </Item>
     <Item class="Folder" referent="RBXEditorHacienda">
-      <Properties><string name="Name">Hacienda</string></Properties>
+      <Properties><string name="Name">HaciendaEditor</string></Properties>
       <Item class="Part" referent="RBXEditorGround">
         <Properties><string name="Name">Ground</string><Vector3 name="Size">170,1,130</Vector3><CFrame name="CFrame">0,-1,0,1,0,0,0,1,0,0,0,1</CFrame><bool name="Anchored">true</bool><Color3 name="Color">0.412,0.667,0.400</Color3><token name="Material">128</token></Properties>
       </Item>
@@ -91,6 +91,8 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Lighting = game:GetService("Lighting")
 local event = ReplicatedStorage:WaitForChild("GameEvent")
 
+local editor = workspace:FindFirstChild("HaciendaEditor")
+if editor then editor:Destroy() end
 local old = workspace:FindFirstChild("Hacienda")
 if old then old:Destroy() end
 local map = Instance.new("Folder")
