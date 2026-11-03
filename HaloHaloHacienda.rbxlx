@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <roblox version="4">
   <Meta name="ExplicitAutoJoints" dt="string">true</Meta>
   <Meta name="FFlagConvertImageLabelsToImageButtons" dt="string">true</Meta>
@@ -153,7 +154,7 @@ event.OnClientEvent:Connect(function(kind,a,b,c)
 	if kind=="Welcome" then info.Text="Your home: Plot "..a.."  |  Ngiti: 0"; show("Mabuhay! Your plot is ready. Order: "..b)
 	elseif kind=="Toast" then show(a)
 	elseif kind=="Order" then show("Spirit order: "..a.." | Cook at the Kusina")
-	elseif kind=="Task" then taskFrame.Visible=a; if a then local needed=3; local count=c or 0; fill.Size=UDim2.fromScale(math.clamp(count/needed,0,1),1); taskText.Text="BAYANIHAN  •  "..b.."s left  •  "..count.." helpers" end end
+	elseif kind=="Task" then taskFrame.Visible=a; if a then local needed=3; local count=c or 0; fill.Size=UDim2.fromScale(math.clamp(count/needed,0,1),1); taskText.Text="BAYANIHAN - "..b.."s left - "..count.." helpers" end end
 end)
 task.spawn(function() while true do task.wait(1); local stats=player:FindFirstChild("leaderstats"); if stats and stats:FindFirstChild("Ngiti") then info.Text="Your home: Plot "..(player:GetAttribute("Plot") or "-").."  |  Ngiti: "..stats.Ngiti.Value end end end)
 ]]></ProtectedString>
