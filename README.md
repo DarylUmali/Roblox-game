@@ -19,9 +19,9 @@
 ## Open and publish
 
 1. Open `HaloHaloHacienda.rbxlx` in Roblox Studio.
-2. In **Build** mode, select **Workspace > HaciendaEditor > EDITOR_MAP_MARKER** and press **F** to frame the serialized editable preview map. Select parts or models and use the Move, Scale, and Rotate tools to customize it manually.
+2. In **Build** mode, select the saved **Workspace > HaciendaEditor** model and press **F** to frame the serialized editable preview map. Select parts or models and use the Move, Scale, and Rotate tools to customize it manually.
 3. Press **Play** to test the farm loop. Use **Start** with multiple players to test Bayanihan.
 4. Set the experience name, thumbnail, and permissions in **Game Settings**.
 5. Use **File > Publish to Roblox** to create or update the live experience.
 
-The place keeps an editor-visible serialized map for manual building in `HaciendaEditor`. The server script creates a separate `Hacienda` gameplay folder when Play starts, so the editor map is not deleted and the camera remains framed on the terrain. Roblox Studio is still required for the final account-specific publish step.
+The place keeps an editor-visible serialized map model for manual building in `HaciendaEditor`. The server script creates a separate `Hacienda` gameplay folder when Play starts, so the editor map is not deleted and the camera remains framed on the terrain. Roblox Studio is still required for the final account-specific publish step.
